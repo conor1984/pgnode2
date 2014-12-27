@@ -4,4 +4,7 @@ pg_ctl -D $PGDATA promote
 rsync --delete -a -k --perms  $PGBOUNCE/pgbouncer.ini maximus@pgbouncer:$PGBOUNCE/
 #reload
 ssh maximus@pgbouncer pgbouncer -R -d $PGBOUNCE/pgbouncer.ini
-#
+#email
+echo "pgnode 1 has failed" | mail -s "node failure"  conor.nagle@firmex.com
+#tell node3 to follow
+#ssh maximus@pgnode3 repmgr -f $PGREP/repmgr.conf standby follow
