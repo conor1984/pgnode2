@@ -75,8 +75,7 @@ RUN	 cd /var/lib/postgresql/9.4 &&\
      
 ADD repmgr.conf $PGREP/repmgr.conf
 
-#RUN 	repmgr -D $PGDATA -d Billboard -p 5432 -U repmgr -R postgres --verbose standby clone pgnode1 &&\
-#	repmgr  -f $PGREP/repmgr.conf --verbose standby register &&\
+#RUN 	repmgr  -f $PGREP/repmgr.conf --verbose standby register &&\
 #	repmgrd -f $PGREP/repmgr.conf --verbose > $PGREP/repmgr.log 2>&1
 
      
