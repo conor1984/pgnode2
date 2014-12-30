@@ -40,7 +40,6 @@ RUN    	cd $PGDATA &&\
 #RUN repmgr -f $PGDATA/repmgr/repmgr.conf --verbose master register
 ADD repmgr.conf $PGDATA/repmgr/repmgr.conf 
 ADD pg_hba.conf $PGCONFIG/pg_hba.conf
-ADD addsudo.sh $PGCONFIG/addsudo.sh
 ADD postgresql.conf $PGCONFIG/postgresql.conf
 ADD .pgpass  $PGHOME/.pgpass
 ADD pgbouncer.ini $PGBOUNCE/pgbouncer.ini
