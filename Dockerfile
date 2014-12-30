@@ -1,93 +1,58 @@
-#Master Node1 
+#
+# example Dockerfile for http://docs.docker.com/examples/postgresql_service/
+#
 
-FROM ubuntu:14.04
-#MAINTAINER conor.nagle@firmex.com
+FROM ubuntu
+MAINTAINER conor.nagle@firmex.com
 
 #Environment 
-ENV PATH 		/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/lib/postgresql/9.4/bin:/usr/bin/pgbench
+ENV PATH 		/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/lib/postgresql/9.4/bin
 ENV PGDATA		/var/lib/postgresql/9.4/main
 ENV PGCONFIG	/etc/postgresql/9.4/main
 ENV PGBOUNCE    /etc/pcgbouncer
 ENV PGLOG		/var/log/postgresql
 ENV PGREP		/etc/postgresql/9.4/repmgr
 ENV PGHOME		/var/lib/postgresql
+ENV PGRUN       /var/run/postgresql
 ENV PSQL        psql --command 
+#ENV PGRUN               /var/run/postgresql
 
-RUN 	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8 &&\
-	echo "deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8 &&\
+    echo "deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main" > /etc/apt/sources.list.d/pgdg.list
 
-#RUN sudo apt-get update &&\
-#    sudo apt-get upgrade &&\
-#    sudo apt-get install -y python-software-properties software-properties-common postgresql-9.4 postgresql-client-9.4 postgresql-contrib-9.4 \
-#	 libxslt-dev libxml2-dev libpam-dev libedit-dev git expect wget \
-#	 pgbouncer repmgr #pgbench pgadmin zabbix-server-pgsql zabbix-frontend-php
-	
-RUN apt-get update && apt-get install -y python-software-properties software-properties-common postgresql-9.4 postgresql-client-9.4 postgresql-contrib-9.4 openssh-server \
+RUN apt-get update &&\
+    apt-get install -y python-software-properties software-properties-common postgresql-9.4 postgresql-client-9.4 postgresql-contrib-9.4 openssh-server  \
+    pgbouncer \
+    repmgr 
 
-#RUN sudo apt-get install -y libxslt1-dev \
-#libxml2-dev \
-#libedit-dev \
-#libpam-dev \
-#python-software-properties \
-#software-properties-common \
+RUN echo "postgres ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
-#postgresql-9.4 \
-#postgresql-client-9.4 \
-#postgresql-contrib-9.4 \
-#libxslt1-dev \
-#libxml2-dev \ 
-#libedit-dev \
-pgbouncer \
-repmgr \
-sendmail \
-mailutils
-
-
-#SSH
-#sudo chown postgres.postgres authorized_keys id_rsa.pub id_rsa &&\
-#sudo mkdir -p ~postgres/.ssh &&\
-#sudo chown postgres.postgres ~postgres/.ssh &&\
-#sudo mv authorized_keys id_rsa.pub id_rsa ~postgres/.ssh &&\
-#sudo chmod -R go-rwx ~postgres/.ssh
-
-#USER postgres
-#RUN     #pg_ctl stop
-	#/etc/init.d/postgresql stop
-#USER root
-#RUN     sudo adduser maximus --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --disabled-password &&\
-#	echo "maximus:max" | chpasswd #&&\
-	#sudo chown -R maximus:maximus /var/lib/postgresql/9.4/main
-	#$PGHOME/  $PGLOG/ $PGCONFIG/ $PGDATA/ $PGRUN
-
-#workaround (maybe not required)
-#RUN sudo mkdir /etc/ssl/private-copy #; mv /etc/ssl/private/* /etc/ssl/private-copy/; rm -r /etc/ssl/private; mv /etc/ssl/private-copy /etc/ssl/private; chmod -R 0700 /etc/ssl/private; chown -R maximus /etc/ssl/private &&\
-    #mkdir /etc/postgresql/9.4/repmgr 
-#ssh-keygen -t rsa -f  var/lib/.ssh/id_rsa -q -N ""  &&\
-
+# Run the rest of the commands as the ``postgres`` user created by the ``postgres-9.3`` package when it was ``apt-get installed``
 USER postgres
-RUN	 cd /var/lib/postgresql/9.4 &&\
-         rm -rf *
-	 #cd ~/.ssh &&\
-	 ######scp id_rsa.pub id_rsa authorized_keys maximus@pgnode2: &&\
-	 ######scp id_rsa.pub id_rsa authorized_keys maximus@pgbouncer: &&\ 
-     #/etc/init.d/postgresql start &&\
-     #pg_ctl start -l $PGLOG/postgresql-9.4-main.log &&\
-     
-ADD repmgr.conf $PGREP/repmgr.conf
+# Create a PostgreSQL role named ``docker`` with ``docker`` as the password and
+# then create a database `docker` owned by the ``docker`` role.
+# Note: here we use ``&&\`` to run commands one after the other - the ``\``
+#       allows the RUN command to span multiple lines.
+RUN    	cd /var/lib/postgresql/9.4 &&\
+	rm -rf * &&\
+	/etc/init.d/postgresql start 
 
-#RUN 	repmgr  -f $PGREP/repmgr.conf --verbose standby register &&\
-#	repmgrd -f $PGREP/repmgr.conf --verbose > $PGREP/repmgr.log 2>&1
-
-     
-ADD postgresql.conf $PGCONFIG/postgresql.conf
+#RUN repmgr -f $PGDATA/repmgr/repmgr.conf --verbose master register
+ADD repmgr.conf $PGDATA/repmgr/repmgr.conf 
 ADD pg_hba.conf $PGCONFIG/pg_hba.conf
+ADD addsudo.sh $PGCONFIG/addsudo.sh
+ADD postgresql.conf $PGCONFIG/postgresql.conf
 ADD .pgpass  $PGHOME/.pgpass
 ADD pgbouncer.ini $PGBOUNCE/pgbouncer.ini
 ADD userlist.txt $PGBOUNCE/userlist.txt
 ADD failover.sh $PGHOME/scripts/failover.sh
-#SSH and repmgr
-#ADD trigger1 /usr/local/bin/trigger
-#RUN chmod +x /usr/local/bin/trigger
+
+#ADD run /usr/local/bin/run
+#RUN chmod +x /usr/local/bin/run
+EXPOSE  5432 6432 22
+
+# Add VOLUMEs to allow backup of config, logs and databases
 VOLUME  ["/etc/postgresql", "/var/log/postgresql", "/var/lib/postgresql"]
-EXPOSE 5432 6432 22
+
+# Set the default command to run when starting the container
 CMD ["/usr/lib/postgresql/9.4/bin/postgres", "-D", "/var/lib/postgresql/9.4/main", "-c", "config_file=/etc/postgresql/9.4/main/postgresql.conf"]
