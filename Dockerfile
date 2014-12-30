@@ -35,7 +35,7 @@ USER postgres
 #       allows the RUN command to span multiple lines.
 RUN    	cd $PGDATA &&\
 	rm -rf * &&\
-	/etc/init.d/postgresql start 
+	#/etc/init.d/postgresql start 
 
 #RUN repmgr -f $PGDATA/repmgr/repmgr.conf --verbose master register
 ADD repmgr.conf $PGDATA/repmgr/repmgr.conf 
