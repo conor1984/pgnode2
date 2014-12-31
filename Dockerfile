@@ -29,9 +29,11 @@ USER postgres
 # then create a database `docker` owned by the ``docker`` role.
 # Note: here we use ``&&\`` to run commands one after the other - the ``\``
 #       allows the RUN command to span multiple lines.
-RUN    /etc/init.d/postgresql start &&\
-       $PSQL "CREATE USER repmgr WITH SUPERUSER PASSWORD 'repmgr';"  &&\
-       $PSQL "CREATE DATABASE Billboard;" 
+RUN    cd $PGDATA &&\
+       rm -rf *
+        #/etc/init.d/postgresql start &&\
+       #$PSQL "CREATE USER repmgr WITH SUPERUSER PASSWORD 'repmgr';"  &&\
+       #$PSQL "CREATE DATABASE Billboard;" 
        #RUN repmgr -f $PGDATA/repmgr/repmgr.conf --verbose standby register
        
 ADD repmgr.conf $PGDATA/repmgr/repmgr.conf 
