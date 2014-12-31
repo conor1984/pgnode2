@@ -1,7 +1,3 @@
-#
-# example Dockerfile for http://docs.docker.com/examples/postgresql_service/
-#
-
 FROM ubuntu:12.04
 MAINTAINER conor.nagle@firmex.com
 
@@ -15,7 +11,6 @@ ENV PGREP		/etc/postgresql/9.4/repmgr
 ENV PGHOME		/var/lib/postgresql
 ENV PGRUN       /var/run/postgresql
 ENV PSQL        psql --command 
-#ENV PGRUN               /var/run/postgresql
 
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8 &&\
     echo "deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main" > /etc/apt/sources.list.d/pgdg.list
@@ -23,9 +18,9 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B97B0AFCAA1A47F044F
 RUN apt-get update &&\
     apt-get install -y libc6 postgresql-9.4  \
     pgbouncer \
-    repmgr 
-    #python-software-properties software-properties-common postgresql-9.4 postgresql-client-9.4 postgresql-contrib-9.4 openssh-server  \
-    
+    repmgr \
+    openssh-server
+    #python-software-properties software-properties-common postgresql-9.4 postgresql-client-9.4 postgresql-contrib-9.4  \
 
 # Run the rest of the commands as the ``postgres`` user created by the ``postgres-9.3`` package when it was ``apt-get installed``
 USER postgres
@@ -35,10 +30,10 @@ USER postgres
 # Note: here we use ``&&\`` to run commands one after the other - the ``\``
 #       allows the RUN command to span multiple lines.
 RUN    /etc/init.d/postgresql start &&\
-       psql --command "CREATE USER docker WITH SUPERUSER PASSWORD 'docker';"  &&\
-       psql --command "CREATE DATABASE docker;" 
-
-#RUN repmgr -f $PGDATA/repmgr/repmgr.conf --verbose master register
+       $PSQL "CREATE USER repmgr WITH SUPERUSER PASSWORD 'repmgr';"  &&\
+       $PSQL "CREATE DATABASE Billboard;" 
+       #RUN repmgr -f $PGDATA/repmgr/repmgr.conf --verbose standby register
+       
 ADD repmgr.conf $PGDATA/repmgr/repmgr.conf 
 ADD pg_hba.conf $PGCONFIG/pg_hba.conf
 ADD postgresql.conf $PGCONFIG/postgresql.conf
@@ -50,6 +45,6 @@ ADD failover.sh $PGHOME/scripts/failover.sh
 #RUN chmod +x /usr/local/bin/run
 EXPOSE  5432 6432 22
 # Add VOLUMEs to allow backup of config, logs and databases
-VOLUME  ["/etc/postgresql", "/var/log/postgresql", "/var/lib/postgresql"]
+VOLUME  ["/etc/postgresql", "$PGLOG", "/var/lib/postgresql"]
 # Set the default command to run when starting the container
-CMD ["/usr/lib/postgresql/9.4/bin/postgres", "-D", "/var/lib/postgresql/9.4/main", "-c", "config_file=/etc/postgresql/9.4/main/postgresql.conf"]
+CMD ["/usr/lib/postgresql/9.4/bin/postgres", "-D", "$PGDATA", "-c", "config_file=$PGCONFIG/postgresql.conf"]
