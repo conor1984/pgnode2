@@ -56,4 +56,4 @@ ADD failover.sh $PGHOME/scripts/failover.sh
 #RUN chmod 755 /var/lib/postgresql/9.4/main/run.sh
 EXPOSE  5432 6432 22
 VOLUME  ["/etc/postgresql", "$PGLOG", "$PGHOME"]
-CMD ["/usr/lib/postgresql/9.4/bin/postgres", "-D", "/var/lib/postgresql/9.4/main", "-c", "config_file=/etc/postgresql/9.4/main/postgresql.conf"]
+#CMD ["/usr/lib/postgresql/9.4/bin/postgres", "-D", "/var/lib/postgresql/9.4/main", "-c", "config_file=/etc/postgresql/9.4/main/postgresql.conf"]
