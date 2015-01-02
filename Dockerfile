@@ -34,10 +34,10 @@ USER postgres
 # Note: here we use ``&&\`` to run commands one after the other - the ``\``
 #       allows the RUN command to span multiple lines.
 RUN    /etc/init.d/postgresql start &&\
-       /etc/init.d/postgresql stop &&\
-       rm -rf $PGDATA/*
-       #$PSQL "CREATE USER repmgr WITH SUPERUSER PASSWORD 'repmgr';"  &&\
-       #createdb -O repmgr repmgr
+       #/etc/init.d/postgresql stop &&\
+       #rm -rf $PGDATA/*
+       $PSQL "CREATE USER repmgr WITH SUPERUSER PASSWORD 'repmgr';"  &&\
+       createdb -O repmgr repmgr
        #$PSQL "CREATE DATABASE Billboard;" 
        #ssh-keygen -t rsa  -f $PGHOME/.ssh/id_rsa -q -N ""  &&\
        #cat $PGHOME/.ssh/id_rsa.pub >> $PGHOME/.ssh/authorized_keys &&\
