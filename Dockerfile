@@ -23,7 +23,8 @@ RUN apt-get update &&\
     apt-get install -y libc6 postgresql-9.4  \
     pgbouncer \
     repmgr \
-    openssh-server
+    openssh-server \
+    inetutils-ping
     #python-software-properties software-properties-common postgresql-9.4 postgresql-client-9.4 postgresql-contrib-9.4  \
 
 ADD repmgr.conf $PGREP/repmgr.conf 
