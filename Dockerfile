@@ -1,3 +1,7 @@
+#
+# example Dockerfile for http://docs.docker.com/examples/postgresql_service/
+#
+
 FROM ubuntu:12.04
 MAINTAINER conor.nagle@firmex.com
 
@@ -29,25 +33,23 @@ USER postgres
 # then create a database `docker` owned by the ``docker`` role.
 # Note: here we use ``&&\`` to run commands one after the other - the ``\``
 #       allows the RUN command to span multiple lines.
-RUN     /etc/init.d/postgresql start 
-        
-#cd $PGDATA &&\
-#       rm -rf *
-       #$PSQL "CREATE USER repmgr WITH SUPERUSER PASSWORD 'repmgr';"  &&\
-       #$PSQL "CREATE DATABASE Billboard;" 
-       #RUN repmgr -f $PGDATA/repmgr/repmgr.conf --verbose standby register
-       
-ADD repmgr.conf $PGDATA/repmgr/repmgr.conf 
-ADD pg_hba.conf $PGCONFIG/pg_hba.conf
+RUN    /etc/init.d/postgresql start &&\
+       $PSQL "CREATE USER repmgr WITH SUPERUSER PASSWORD 'repmgr';"  &&\
+       $PSQL "CREATE DATABASE Billboard;" 
+       #ssh-keygen -t rsa  -f $PGHOME/.ssh/id_rsa -q -N ""  &&\
+       #cat $PGHOME/.ssh/id_rsa.pub >> $PGHOME/.ssh/authorized_keys &&\
+       #chmod go-rwx $PGHOME/.ssh/* &&\
+
 ADD postgresql.conf $PGCONFIG/postgresql.conf
+ADD pg_hba.conf $PGCONFIG/pg_hba.conf
+ADD repmgr.conf $PGDATA/repmgr/repmgr.conf 
 #ADD .pgpass  $PGHOME/.pgpass
 ADD pgbouncer.ini $PGBOUNCE/pgbouncer.ini
 ADD userlist.txt $PGBOUNCE/userlist.txt
 ADD failover.sh $PGHOME/scripts/failover.sh
-#ADD run /usr/local/bin/run
-#RUN chmod +x /usr/local/bin/run
+#ADD run.sh /var/lib/postgresql/9.4/main/run.sh
+#RUN chmod +x /var/lib/postgresql/9.4/main/run.sh
+#RUN chmod 755 /var/lib/postgresql/9.4/main/run.sh
 EXPOSE  5432 6432 22
-# Add VOLUMEs to allow backup of config, logs and databases
-VOLUME  ["/etc/postgresql", "$PGLOG", "/var/lib/postgresql"]
-# Set the default command to run when starting the container
+VOLUME  ["/etc/postgresql", "$PGLOG", "$PGHOME"]
 CMD ["/usr/lib/postgresql/9.4/bin/postgres", "-D", "$PGDATA", "-c", "config_file=$PGCONFIG/postgresql.conf"]
