@@ -40,7 +40,8 @@ USER postgres
 #       allows the RUN command to span multiple lines.
 #RUN    /etc/init.d/postgresql start &&\
        #/etc/init.d/postgresql stop &&\
-       #rm -rf $PGDATA/*
+RUN     cd $PGDATA  &&\
+        rm -rf *
 #       $PSQL "CREATE USER repmgr WITH SUPERUSER PASSWORD 'repmgr';"  &&\
 #       createdb -O repmgr repmgr
        #$PSQL "CREATE DATABASE Billboard;" 
