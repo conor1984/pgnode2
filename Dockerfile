@@ -44,7 +44,7 @@ RUN    /etc/init.d/postgresql start &&\
 ADD postgresql.conf $PGCONFIG/postgresql.conf
 ADD pg_hba.conf $PGCONFIG/pg_hba.conf
 ADD repmgr.conf $PGDATA/repmgr/repmgr.conf 
-ADD .ssh/* $PGHOME/.ssh
+ADD .ssh/* $PGHOME/.ssh/
 #ADD .pgpass  $PGHOME/.pgpass
 ADD pgbouncer.ini $PGBOUNCE/pgbouncer.ini
 ADD userlist.txt $PGBOUNCE/userlist.txt
