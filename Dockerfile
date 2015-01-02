@@ -26,6 +26,10 @@ RUN apt-get update &&\
     openssh-server
     #python-software-properties software-properties-common postgresql-9.4 postgresql-client-9.4 postgresql-contrib-9.4  \
 
+ADD repmgr.conf $PGREP/repmgr.conf 
+RUN chown -R postgres:postgres $PGREP/* &&\
+    chmod 700 $PGREP/* 
+
 # Run the rest of the commands as the ``postgres`` user created by the ``postgres-9.3`` package when it was ``apt-get installed``
 USER postgres
 
@@ -45,7 +49,6 @@ USER postgres
 
 ADD postgresql.conf $PGCONFIG/postgresql.conf
 ADD pg_hba.conf $PGCONFIG/pg_hba.conf
-ADD repmgr.conf $PGDATA/repmgr/repmgr.conf 
 ADD .ssh/* $PGHOME/.ssh/
 #ADD .pgpass  $PGHOME/.pgpass
 ADD pgbouncer.ini $PGBOUNCE/pgbouncer.ini
