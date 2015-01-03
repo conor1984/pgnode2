@@ -29,8 +29,9 @@ RUN apt-get update &&\
 
 ADD repmgr.conf $PGREP/repmgr.conf 
 RUN chown -R postgres:postgres $PGREP/* &&\
-    chmod 700 $PGREP/* 
-
+    chown -R postgres:postgres $PGHOME/* &&\
+    chmod 700 $PGREP/*  &&\
+    chmod 700 $PGHOME/*  
 # Run the rest of the commands as the ``postgres`` user created by the ``postgres-9.3`` package when it was ``apt-get installed``
 USER postgres
 
