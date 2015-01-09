@@ -7,4 +7,4 @@ ssh postgres@pgbouncer pgbouncer -R -d $PGBOUNCE/pgbouncer.ini
 #email
 #echo "pgnode 1 has failed" | mail -s "node failure"  conor.nagle@firmex.com
 #tell node3 to follow
-#ssh maximus@pgnode3 repmgr -f $PGREP/repmgr.conf standby follow
+#ssh postgres@pgnode3 repmgr -f $PGREP/repmgr.conf standby follow
