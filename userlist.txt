@@ -1,2 +1,2 @@
-"maximus"  "max"
-"postgres"   "postgres"
+#Replace with md5
+"postgres" "postgres"
